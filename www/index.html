@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>مختبر الريحان - نصائح التحاليل الطبية</title>
+  <style>
+    :root {
+      --teal: #007a87;
+      --teal-dark: #005b66;
+      --teal-light: #e6f4f6;
+      --red: #d9232e;
+      --red-light: #fdebec;
+      --bg: #f6f9fa;
+      --card: #ffffff;
+      --text: #1c282b;
+      --muted: #5a6d72;
+      --border: #dce7ea;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Tahoma, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding-bottom: 84px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+      color: #fff;
+      padding: 20px 16px 26px;
+      border-bottom-left-radius: 26px;
+      border-bottom-right-radius: 26px;
+      box-shadow: 0 6px 20px rgba(0, 122, 135, 0.18);
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .logo-badge {
+      width: 56px;
+      height: 56px;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+
+    .brand-title p {
+      font-size: 0.82rem;
+      opacity: 0.92;
+      font-weight: 500;
+    }
+
+    .search-box {
+      position: relative;
+      margin-top: 6px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 42px 12px 14px;
+      border: none;
+      border-radius: 14px;
+      background: #fff;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--teal);
+      font-size: 1.05rem;
+    }
+
+    .categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 14px 16px 6px;
+      scrollbar-width: none;
+    }
+
+    .categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cat-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cat-btn.active {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal);
+      box-shadow: 0 3px 8px rgba(0, 122, 135, 0.22);
+    }
+
+    .container {
+      padding: 10px 16px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .disclaimer-banner {
+      background: var(--red-light);
+      border-right: 4px solid var(--red);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      color: #7c141b;
+      margin-bottom: 14px;
+    }
+
+    .test-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .test-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--teal-dark);
+    }
+
+    .test-en {
+      font-size: 0.78rem;
+      color: var(--muted);
+      direction: ltr;
+      text-align: right;
+    }
+
+    .fasting-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .fasting-yes {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .fasting-no {
+      background: var(--teal-light);
+      color: var(--teal-dark);
+    }
+
+    .section-label {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-top: 10px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tips-list {
+      padding-right: 18px;
+      font-size: 0.88rem;
+      color: #2f3e42;
+    }
+
+    .tips-list li {
+      margin-bottom: 4px;
+    }
+
+    .avoid-box {
+      margin-top: 10px;
+      background: #fff9f9;
+      border: 1px dashed #f0b8bc;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      color: #8b1c23;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--muted);
+      display: none;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 10px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--teal);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .info-card h3 {
+      color: var(--teal-dark);
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .info-card p, .info-card li {
+      font-size: 0.9rem;
+      color: #2f3e42;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-bar">
+      <div class="logo-badge" aria-label="شعار مختبر الريحان">
+        <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="42" stroke="#007a87" stroke-width="5" stroke-dasharray="220 35" />
+          <path d="M44 22L53 17L62 33L53 38L44 22Z" fill="#007a87"/>
+          <path d="M51 36C39 43 36 58 45 72H68V78H32V72H39C28 56 32 38 47 30L51 36Z" fill="#007a87"/>
+          <rect x="46" y="54" width="24" height="4" rx="2" fill="#007a87"/>
+          <path d="M35 46C33 60 44 70 62 74" stroke="#d9232e" stroke-width="5" stroke-linecap="round"/>
+          <path d="M41 44C42 56 51 64 66 67" stroke="#d9232e" stroke-width="4" stroke-linecap="round"/>
+          <line x1="38" y1="53" x2="45" y2="50" stroke="#d9232e" stroke-width="3"/>
+          <line x1="43" y1="61" x2="51" y2="57" stroke="#d9232e" stroke-width="3"/>
+          <line x1="51" y1="67" x2="59" y2="63" stroke="#d9232e" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="brand-title">
+        <h1>مختبر الريحان</h1>
+        <p>LABORATOIRE ERRAYHANE • دليل التحاليل الطبية</p>
+      </div>
+    </div>
+
+    <div class="search-box" id="searchContainer">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="ابحث عن تحليل (مثال: السكري، الغدة الدرقية، الكوليسترول...)" />
+    </div>
+  </header>
+
+  <main id="tab-tests" class="tab-panel active">
+    <div class="categories" id="categoryBar">
+      <button class="cat-btn active" data-cat="all">الكل</button>
+      <button class="cat-btn" data-cat="biochem">الكيمياء الحيوية</button>
+      <button class="cat-btn" data-cat="hormones">الهرمونات</button>
+      <button class="cat-btn" data-cat="hemato">أمراض الدم</button>
+      <button class="cat-btn" data-cat="micro">البكتيريا والبول</button>
+    </div>
+
+    <div class="container">
+      <div class="disclaimer-banner">
+        <strong>تنبيه طبي:</strong> المعلومات الواردة في هذا التطبيق إرشادية للتحضير قبل التحاليل، ولا تغني عن استشارة الطبيب المعالج أو البيولوجي.
+      </div>
+
+      <div id="testsList"></div>
+      <div class="empty-state" id="emptyState">
+        لم يتم العثور على تحليل مطابق لبحثك. جرّب كتابة اسم التحليل بالعربية أو الفرنسية.
+      </div>
+    </div>
+  </main>
+
+  <main id="tab-general" class="tab-panel">
+    <div class="container" style="padding-top: 16px;">
+      <div class="info-card">
+        <h3>⏱️ قواعد الصيام الصحيحة قبل التحاليل</h3>
+        <ul class="tips-list">
+          <li>الصيام المطلوب لأغلب التحاليل يتراوح بين <strong>8 إلى 12 ساعة</strong> حسب نوع الفحص.</li>
+          <li>يُسمح بشرب <strong>الماء العادي فقط</strong> بكميات معتدلة خلال فترة الصيام.</li>
+          <li>يُمنع تماماً شرب القهوة، الشاي، العصائر، التدخين، أو مضغ العلكة.</li>
+          <li>يفضّل إجراء سحب الدم صباحاً بين الساعة <strong>7:30 و 10:00 صباحاً</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>💊 الأدوية والنشاط البدني</h3>
+        <ul class="tips-list">
+          <li>لا توقف أي دواء مزمن دون استشارة طبيبك، وأخبر فريق المختبر بجميع الأدوية أو المكملات التي تتناولها.</li>
+          <li>تجنب المجهود الرياضي الشاق خلال الـ 24 ساعة السابقة لسحب العينة.</li>
+          <li>احرص على إحضار الوصفة الطبية وبطاقة التعريف عند الحضور للمختبر.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <main id="tab-lab" class="tab-panel">
+    <div class="container" style="padding-top: 16px;">
+      <div class="info-card">
+        <h3>🏥 مختبر الريحان للتحاليل الطبية</h3>
+        <p><strong>LABORATOIRE ERRAYHANE</strong></p>
+        <p style="margin-top: 8px;">نرافقكم بدقة وموثوقية لإجراء كافة التحاليل الطبية البيوكيميائية، الهرمونية، الدموية، والميكروبيولوجية وفق معايير الجودة والسلامة.</p>
+      </div>
+
+      <div class="info-card">
+        <h3>🕒 أوقات العمل والاستقبال</h3>
+        <ul class="tips-list">
+          <li><strong>الإثنين - الجمعة:</strong> 07:30 صباحاً – 19:00 مساءً</li>
+          <li><strong>السبت:</strong> 07:30 صباحاً – 14:00 بعد الزوال</li>
+          <li><strong>المستعجلات والمداومة:</strong> حسب برنامج الحراسة</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="tab-tests">
+      <span>🧪</span>
+      <span>دليل التحاليل</span>
+    </button>
+    <button class="nav-item" data-target="tab-general">
+      <span>📋</span>
+      <span>نصائح عامة</span>
+    </button>
+    <button class="nav-item" data-target="tab-lab">
+      <span>🏥</span>
+      <span>عن المختبر</span>
+    </button>
+  </nav>
+
+  <script>
+    const testsData = [
+      {
+        name: "تحليل السكر الصائم",
+        en: "Glycémie à jeun",
+        cat: "biochem",
+        fasting: "صيام 8 إلى 10 ساعات",
+        requiresFasting: true,
+        tips: [
+          "الامتناع عن الأكل والشرب (باستثناء الماء) لمدة 8 إلى 10 ساعات قبل السحب.",
+          "إجراء السحب في الصباح الباكر للحصول على أدق نتيجة."
+        ],
+        avoid: "تجنب تناول وجبة دسمة أو حلويات في وقت متأخر من الليلة السابقة."
+      },
+      {
+        name: "تحليل الدهون والكوليسترول",
+        en: "Bilan lipidique (Cholestérol, Triglycérides)",
+        cat: "biochem",
+        fasting: "صيام 12 ساعة",
+        requiresFasting: true,
+        tips: [
+          "الصيام التام لمدة 12 ساعة كاملة ضروري خاصة لقياس الدهون الثلاثية.",
+          "يمكن شرب الماء فقط أثناء فترة الصيام."
+        ],
+        avoid: "تجنب التدخين والقهوة صباح التحليل لأنها قد تؤثر على النتائج."
+      },
+      {
+        name: "تحليل الغدة الدرقية",
+        en: "Bilan thyroïdien (TSH, FT3, FT4)",
+        cat: "hormones",
+        fasting: "لا يشترط الصيام",
+        requiresFasting: false,
+        tips: [
+          "يفضل إجراء السحب في الصباح قبل الساعة 10:00 لتوحيد التوقيت الهرموني.",
+          "في حال تناول دواء الغدة الدرقية (Levothyrox)، يُسحب الدم قبل أخذ حبة الصباح."
+        ],
+        avoid: "تجنب تناول مكملات البيوتين (فيتامين B7) قبل التحليل بـ 48 ساعة."
+      },
+      {
+        name: "تعداد الدم الكامل",
+        en: "Numération Formule Sanguine (NFS)",
+        cat: "hemato",
+        fasting: "لا يشترط الصيام",
+        requiresFasting: false,
+        tips: [
+          "يمكن إجراؤه في أي وقت من اليوم، ويفضل تجنب الوجبات الدسمة جداً قبله مباشرة.",
+          "أخبر المختبر إذا كنت تتناول أدوية مسيلة للدم أو مضادات حيوية."
+        ],
+        avoid: "تجنب التوتر الشديد أو المجهود البدني العنيف قبل سحب الدم مباشرة."
+      },
+      {
+        name: "الخزان التراكمي للسكري",
+        en: "Hémoglobine glyquée (HbA1c)",
+        cat: "biochem",
+        fasting: "لا يشترط الصيام",
+        requiresFasting: false,
+        tips: [
+          "يعكس معدل السكر في الدم خلال الأشهر الثلاثة الماضية ولا يتأثر بوجبة اليوم.",
+          "يمكن إجراؤه في أي وقت من اليوم."
+        ],
+        avoid: "لا حاجة لتغيير نظامك الغذائي المعتاد قبل هذا الفحص."
+      },
+      {
+        name: "فحص البول البكتيري",
+        en: "Examen Cytobactériologique des Urines (ECBU)",
+        cat: "micro",
+        fasting: "لا يشترط الصيام",
+        requiresFasting: false,
+        tips: [
+          "استخدام عبوة معقمة خاصة من المختبر أو الصيدلية.",
+          "غسل اليدين والمنطقة التناسلية جيداً بالماء والصابون قبل الجمع.",
+          "جمع عينة منتصف البول الصباحي الأول وإيصالها للمختبر خلال ساعة."
+        ],
+        avoid: "لا تقم بأخذ المضادات الحيوية قبل جمع العينة إلا بأمر الطبيب."
+      },
+      {
+        name: "هرمون الحليب (البرولاكتين)",
+        en: "Prolactine",
+        cat: "hormones",
+        fasting: "يفضل الصيام والراحة",
+        requiresFasting: true,
+        tips: [
+          "يجب الاستيقاظ قبل التحليل بساعتين على الأقل.",
+          "الجلوس والاسترخاء التام في المختبر لمدة 15 إلى 20 دقيقة قبل السحب."
+        ],
+        avoid: "تجنب التوتر النفسي والجهد البدني قبل الدخول لغرفة السحب."
+      },
+      {
+        name: "مخزون الحديد والحديد في الدم",
+        en: "Fer sérique & Ferritine",
+        cat: "hemato",
+        fasting: "صيام 8 ساعات",
+        requiresFasting: true,
+        tips: [
+          "يُفضّل إجراء التحليل صباحاً بعد صيام 8 ساعات لأن نسبة الحديد تتغير خلال اليوم.",
+          "أبلغ المختبر إذا كنت تتناول حبوب الحديد أو الفيتامينات."
+        ],
+        avoid: "تجنب أخذ مكملات الحديد في صباح يوم التحليل."
+      }
+    ];
+
+    const testsList = document.getElementById("testsList");
+    const searchInput = document.getElementById("searchInput");
+    const emptyState = document.getElementById
+  
