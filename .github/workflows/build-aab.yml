@@ -30,7 +30,7 @@ jobs:
           # التأكد من وجود ملف package.json (إذا قمت بإنشاء الملف فقط عبر web editor)
           if [ ! -f "package.json" ]; then
             echo "Initialisation de package.json..."
-            npm init -y > /dev/null
+            npm install > /dev/null
           fi
 
           echo "Installation des dépendances..."
