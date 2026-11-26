@@ -45,4 +45,3 @@ jobs:
         with:
           name: errayhane-aab
           path: android/app/build/outputs/bundle/release/*.aab
-          
