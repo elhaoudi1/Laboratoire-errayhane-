@@ -1,4 +1,4 @@
-name: Build Android AAB
+name: Build Android AAB (Ultimate Fix)
 
 on:
   workflow_dispatch:
@@ -13,35 +13,77 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js (v20)
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Setup Java 17
+      - name: Setup Java (17)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Capacitor and Android project
+      # خطوة حاسمة لإصلاح أخطاء aapt2: تثبيت مكتبات zlib 32-bit الضرورية لنظام Ubuntu
+      - name: Install 32-bit libraries for Android SDK
         run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "مختبر الريحان" "ma.errayhane.analyses" --web-dir=www
-          npx cap add android
+          echo "Installation de lib32z1 et libc6-i386..."
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y zlib1g:i386 libc6:i386 libstdc++6:i386 libncurses5:i386 libbz2-1.0:i386 -qq > /dev/null
+
+      # إعداد بيئة Android SDK محلياً في سير العمل
+      - name: Setup Android SDK and Tools
+        run: |
+          echo "Configuration du SDK Android..."
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          # تحميل Command Line Tools (أحدث إصدار)
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
+          unzip -q commandlinetools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          rm commandlinetools.zip
+
+          # قبول التراخيص تلقائياً
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
+
+          # تثبيت الحزم الأساسية للبناء (Build Tools, Platform Tools, Platforms)
+          echo "Installation des paquets SDK requis..."
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-34" > /dev/null
+
+      - name: Install Dependencies and Sync Capacitor
+        run: |
+          echo "Installation des dépendances web..."
+          npm ci --quiet || npm install --quiet
+
+          echo "Configuration de Capacitor..."
+          # إعادة تهيئة المشروع للتأكد من المسارات
+          npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www --quiet
+
+          if [ ! -d "android" ]; then
+             echo "Ajout de la plateforme Android..."
+             npx cap add android --quiet
+          fi
+
+          echo "Synchronisation de Capacitor..."
           npx cap sync android
 
       - name: Build Android App Bundle (AAB)
+        env:
+          # تحديد نسخة Build Tools المستخدمة لتجنب تعارضات Gradle
+          BUILD_TOOLS_VERSION: "34.0.0"
         run: |
           cd android
-          ./gradlew bundleRelease
+          chmod +x gradlew
+
+          # التأكد من أن Gradle يستخدم نسخة Java المطلوبة
+          export JAVA_HOME=/usr/lib/jvm/zulu17-amd64
+
+          echo "Nettoyage et construction du bundleRelease..."
+          ./gradlew clean bundleRelease
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: errayhane-aab
+          name: errayhane-app-release.aab
           path: android/app/build/outputs/bundle/release/*.aab
+          
