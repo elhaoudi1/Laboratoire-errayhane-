@@ -1,4 +1,4 @@
-name: Build Android AAB (Ultimate Fix)
+name: Build Android AAB (Simplified Stable)
 
 on:
   workflow_dispatch:
@@ -13,77 +13,59 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (v20)
+      - name: Setup Node.js (v18)
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
 
-      - name: Setup Java (17)
+      - name: Setup Java (11)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
 
-      # خطوة حاسمة لإصلاح أخطاء aapt2: تثبيت مكتبات zlib 32-bit الضرورية لنظام Ubuntu
-      - name: Install 32-bit libraries for Android SDK
+      # خطوة تثبيت حزم المشروع ومزامنة Capacitor
+      - name: Install and Sync
         run: |
-          echo "Installation de lib32z1 et libc6-i386..."
-          sudo dpkg --add-architecture i386
-          sudo apt-get update -qq
-          sudo apt-get install -y zlib1g:i386 libc6:i386 libstdc++6:i386 libncurses5:i386 libbz2-1.0:i386 -qq > /dev/null
-
-      # إعداد بيئة Android SDK محلياً في سير العمل
-      - name: Setup Android SDK and Tools
-        run: |
-          echo "Configuration du SDK Android..."
-          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-          # تحميل Command Line Tools (أحدث إصدار)
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
-          unzip -q commandlinetools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
-          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
-          rm commandlinetools.zip
-
-          # قبول التراخيص تلقائياً
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
-
-          # تثبيت الحزم الأساسية للبناء (Build Tools, Platform Tools, Platforms)
-          echo "Installation des paquets SDK requis..."
-          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platform-tools" "platforms;android-34" > /dev/null
-
-      - name: Install Dependencies and Sync Capacitor
-        run: |
-          echo "Installation des dépendances web..."
-          npm ci --quiet || npm install --quiet
-
-          echo "Configuration de Capacitor..."
-          # إعادة تهيئة المشروع للتأكد من المسارات
-          npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www --quiet
-
-          if [ ! -d "android" ]; then
-             echo "Ajout de la plateforme Android..."
-             npx cap add android --quiet
+          # التأكد من وجود ملف package.json (إذا قمت بإنشاء الملف فقط عبر web editor)
+          if [ ! -f "package.json" ]; then
+            echo "Initialisation de package.json..."
+            npm init -y > /dev/null
           fi
 
-          echo "Synchronisation de Capacitor..."
-          npx cap sync android
+          echo "Installation des dépendances..."
+          npm ci > /dev/null || npm install > /dev/null
 
+          echo "Configuration et Synchronisation de Capacitor..."
+          # إعادة تهيئة المشروع بمعرف التطبيق ومسار الويب للتأكد من التكوين الصحيح
+          npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www > /dev/null
+
+          # إضافة منصة Android إذا لم تكن موجودة
+          if [ ! -d "android" ]; then
+             echo "Ajout de la plateforme Android..."
+             npx cap add android > /dev/null
+          fi
+
+          # مزامنة ملفات الويب مع مشروع Android
+          npx cap sync android > /dev/null
+
+      # خطوة بناء الحزمة (.aab) مع أمر التنظيف (clean)
       - name: Build Android App Bundle (AAB)
-        env:
-          # تحديد نسخة Build Tools المستخدمة لتجنب تعارضات Gradle
-          BUILD_TOOLS_VERSION: "34.0.0"
         run: |
           cd android
           chmod +x gradlew
 
-          # التأكد من أن Gradle يستخدم نسخة Java المطلوبة
-          export JAVA_HOME=/usr/lib/jvm/zulu17-amd64
+          # تنفيذ أمر التنظيف أولاً لإزالة أي تضارب سابق
+          echo "Nettoyage du projet Gradle (clean)..."
+          ./gradlew clean
 
-          echo "Nettoyage et construction du bundleRelease..."
-          ./gradlew clean bundleRelease
+          # بناء الحزمة النهائية الموقعة (للنشر)
+          echo "Construction du bundleRelease..."
+          ./gradlew bundleRelease
 
       - name: Upload AAB artifact
+        # رفع الملف الناتج
         uses: actions/upload-artifact@v4
         with:
-          name: errayhane-app-release.aab
+          name: errayhane-release-aab
           path: android/app/build/outputs/bundle/release/*.aab
-          
