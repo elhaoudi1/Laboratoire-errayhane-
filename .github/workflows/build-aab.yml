@@ -34,7 +34,7 @@ jobs:
           fi
 
           echo "Installation des dépendances..."
-          npm install > /dev/null || npm install > /dev/null
+          npm install > /dev/null
 
           echo "Configuration et Synchronisation de Capacitor..."
           # إعادة تهيئة المشروع بمعرف التطبيق ومسار الويب للتأكد من التكوين الصحيح
