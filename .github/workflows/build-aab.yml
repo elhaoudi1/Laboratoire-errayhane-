@@ -1,9 +1,10 @@
-name: Build Android AAB (Simplified Stable)
+name: Build Android AAB
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
 
 jobs:
   build:
@@ -13,59 +14,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js (v18)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Setup Java (11)
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
-      # خطوة تثبيت حزم المشروع ومزامنة Capacitor
-      - name: Install and Sync
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Capacitor and sync web files
         run: |
-          # التأكد من وجود ملف package.json (إذا قمت بإنشاء الملف فقط عبر web editor)
           if [ ! -f "package.json" ]; then
-            echo "Initialisation de package.json..."
-            npm install > /dev/null
+            npm init -y
           fi
-
-          echo "Installation des dépendances..."
-          npm install > /dev/null
-
-          echo "Configuration et Synchronisation de Capacitor..."
-          # إعادة تهيئة المشروع بمعرف التطبيق ومسار الويب للتأكد من التكوين الصحيح
-          npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www > /dev/null
-
-          # إضافة منصة Android إذا لم تكن موجودة
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          if [ ! -f "capacitor.config.json" ] && [ ! -f "capacitor.config.ts" ]; then
+            npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www
+          fi
           if [ ! -d "android" ]; then
-             echo "Ajout de la plateforme Android..."
-             npx cap add android > /dev/null
+            npx cap add android
           fi
+          npx cap sync android
 
-          # مزامنة ملفات الويب مع مشروع Android
-          npx cap sync android > /dev/null
-
-      # خطوة بناء الحزمة (.aab) مع أمر التنظيف (clean)
-      - name: Build Android App Bundle (AAB)
+      - name: Build Android App Bundle
         run: |
           cd android
           chmod +x gradlew
-
-          # تنفيذ أمر التنظيف أولاً لإزالة أي تضارب سابق
-          echo "Nettoyage du projet Gradle (clean)..."
-          ./gradlew clean
-
-          # بناء الحزمة النهائية الموقعة (للنشر)
-          echo "Construction du bundleRelease..."
           ./gradlew bundleRelease
 
       - name: Upload AAB artifact
-        # رفع الملف الناتج
         uses: actions/upload-artifact@v4
         with:
-          name: errayhane-release-aab
-          path: android/app/build/outputs/bundle/release/*.aab       
+          name: errayhane-aab
+          path: android/app/build/outputs/bundle/release/*.aab
