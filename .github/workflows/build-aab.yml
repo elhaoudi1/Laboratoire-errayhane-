@@ -1,73 +1,71 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>مختبر الريحان</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        :root { --teal: #007a87; --teal-dark: #005b66; --red: #d9232e; --bg: #f6f9fa; --text: #1c282b; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
-        header { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); color: #fff; padding: 20px; text-align: center; }
-        .logo-svg { width: 60px; height: 60px; background: #fff; border-radius: 15px; padding: 5px; margin-bottom: 10px; }
-        h1 { font-size: 1.3rem; font-weight: 800; }
-        p { font-size: 0.9rem; opacity: 0.9; }
-        .container { padding: 20px; }
-        .info-card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-right: 4px solid var(--teal); }
-        h3 { color: var(--teal-dark); font-size: 1.1rem; margin-bottom: 8px; }
-        ul { padding-right: 20px; font-size: 0.9rem; color: #333; }
-        li { margin-bottom: 4px; }
-        .disclaimer { background: #fdebec; color: #7c141b; padding: 10px; border-radius: 10px; font-size: 0.8rem; text-align: center; margin-top: 20px; }
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 15px; }
-        .nav-item { text-align: center; color: var(--teal); font-size: 0.8rem; font-weight: bold; text-decoration: none; }
-    </style>
-</head>
-<body>
+name: Build Android AAB (Simplified Stable)
 
-    <header>
-        <!-- شعار مختبر الريحان مدمج بصيغة SVG -->
-        <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="42" stroke="#007a87" stroke-width="5" fill="none" stroke-dasharray="220 35"/>
-            <path d="M44 22L53 17L62 33L53 38L44 22Z" fill="#007a87"/>
-            <path d="M51 36C39 43 36 58 45 72H68V78H32V72H39C28 56 32 38 47 30L51 36Z" fill="#007a87"/>
-            <rect x="46" y="54" width="24" height="4" rx="2" fill="#007a87"/>
-            <path d="M35 46C33 60 44 70 62 74" stroke="#d9232e" stroke-width="5" stroke-linecap="round"/>
-            <path d="M41 44C42 56 51 64 66 67" stroke="#d9232e" stroke-width="4" stroke-linecap="round"/>
-            <line x1="38" y1="53" x2="45" y2="50" stroke="#d9232e" stroke-width="3"/>
-            <line x1="43" y1="61" x2="51" y2="57" stroke="#d9232e" stroke-width="3"/>
-            <line x1="51" y1="67" x2="59" y2="63" stroke="#d9232e" stroke-width="3"/>
-        </svg>
-        <h1>مختبر الريحان</h1>
-        <p>نصائح التحاليل الطبية</p>
-    </header>
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
 
-    <div class="container">
-        <div class="info-card">
-            <h3>⏱️ قواعد الصيام</h3>
-            <ul>
-                <li>أغلب التحاليل تتطلب 8 إلى 12 ساعة صيام.</li>
-                <li>يُسمح بشرب الماء فقط خلال فترة الصيام.</li>
-                <li>تجنب القهوة، الشاي، والتدخين.</li>
-            </ul>
-        </div>
-        <div class="info-card">
-            <h3>💊 الأدوية</h3>
-            <ul>
-                <li>لا توقف أدويتك المزمنة قبل استشارة الطبيب.</li>
-                <li>أخبر المختبر بالأدوية التي تتناولها.</li>
-            </ul>
-        </div>
-        <div class="disclaimer">
-            <strong>تنبيه:</strong> هذه المعلومات إرشادية ولا تغني عن استشارة الطبيب.
-        </div>
-    </div>
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    <nav class="nav">
-        <a href="#" class="nav-item">الرئيسية</a>
-        <a href="tel:+212500000000" class="nav-item">اتصل بنا</a>
-        <a href="https://maps.google.com" class="nav-item">موقعنا</a>
-    </nav>
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-</body>
-</html>
+      - name: Setup Node.js (v18)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Java (11)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # خطوة تثبيت حزم المشروع ومزامنة Capacitor
+      - name: Install and Sync
+        run: |
+          # التأكد من وجود ملف package.json (إذا قمت بإنشاء الملف فقط عبر web editor)
+          if [ ! -f "package.json" ]; then
+            echo "Initialisation de package.json..."
+            npm init -y > /dev/null
+          fi
+
+          echo "Installation des dépendances..."
+          npm ci > /dev/null || npm install > /dev/null
+
+          echo "Configuration et Synchronisation de Capacitor..."
+          # إعادة تهيئة المشروع بمعرف التطبيق ومسار الويب للتأكد من التكوين الصحيح
+          npx cap init "Laboratoire Errayhane" "ma.errayhane.analyses" --web-dir=www > /dev/null
+
+          # إضافة منصة Android إذا لم تكن موجودة
+          if [ ! -d "android" ]; then
+             echo "Ajout de la plateforme Android..."
+             npx cap add android > /dev/null
+          fi
+
+          # مزامنة ملفات الويب مع مشروع Android
+          npx cap sync android > /dev/null
+
+      # خطوة بناء الحزمة (.aab) مع أمر التنظيف (clean)
+      - name: Build Android App Bundle (AAB)
+        run: |
+          cd android
+          chmod +x gradlew
+
+          # تنفيذ أمر التنظيف أولاً لإزالة أي تضارب سابق
+          echo "Nettoyage du projet Gradle (clean)..."
+          ./gradlew clean
+
+          # بناء الحزمة النهائية الموقعة (للنشر)
+          echo "Construction du bundleRelease..."
+          ./gradlew bundleRelease
+
+      - name: Upload AAB artifact
+        # رفع الملف الناتج
+        uses: actions/upload-artifact@v4
+        with:
+          name: errayhane-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab       
